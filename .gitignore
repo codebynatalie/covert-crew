@@ -1,2 +1,5 @@
 # Local Claude Code / editor settings
 .claude/
+
+# Store packages (rebuilt by store\build-zip.ps1)
+dist/

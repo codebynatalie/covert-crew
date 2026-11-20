@@ -65,3 +65,7 @@ Chrome doesn't let extensions run on `chrome://` pages, the New Tab page or the 
 | `content/styles.js` | Animations and expressions |
 | `content/engine.js` | Behavior, physics, interactions and reactions |
 | `popup/` | The settings popup |
+
+## Publishing
+
+Everything needed for the Chrome Web Store and Microsoft Edge Add-ons is in [`store/`](store/README.md): the packaging script, listing text, screenshots, promo art and a step-by-step checklist. The privacy policy is [PRIVACY.md](PRIVACY.md).

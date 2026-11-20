@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Covert Crew in Tab",
   "version": "1.0.0",
-  "description": "A tiny family of secret agents (and their dachshund) lives in your browser: they walk, climb, react to your searches and cheer you on.",
+  "description": "A tiny family of secret agents and their dachshund live in your browser: they walk, climb, react to your searches and cheer you on.",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",

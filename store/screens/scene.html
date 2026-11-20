@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Covert Crew store screenshot</title>
+<!--
+  Stages the crew in fixed poses for store screenshots.
+  Rendered by store\make-images.ps1 with headless Edge: scene.html?s=1 ... ?s=5
+-->
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { font: 15px/1.55 "Segoe UI", system-ui, sans-serif; color: #2d2a32; background: #fbfaf7; }
+  .caption {
+    position: fixed; left: 0; right: 0; top: 0; height: 92px; z-index: 5;
+    display: flex; align-items: center; gap: 18px; padding: 0 44px;
+    background: linear-gradient(100deg, #2f4756, #46677a 55%, #5b7f93); color: #fff;
+    box-shadow: 0 3px 12px rgba(0,0,0,.18);
+  }
+  .caption .badge { width: 54px; height: 54px; border-radius: 50%; background: #f2c230; display: grid; place-items: center; flex: none; box-shadow: inset 0 0 0 3px #2a2230; }
+  .caption .badge svg { width: 38px; }
+  .caption h1 { margin: 0; font-size: 31px; font-weight: 800; letter-spacing: .2px; }
+  .caption p { margin: 2px 0 0; font-size: 16px; opacity: .88; }
+  .page { position: absolute; top: 92px; left: 0; right: 0; bottom: 0; overflow: hidden; }
+
+  /* generic site chrome */
+  .site-top { height: 58px; display: flex; align-items: center; gap: 28px; padding: 0 60px; background: #fff; border-bottom: 1px solid #e8e4dc; }
+  .logo { font-weight: 800; font-size: 20px; color: #b4532a; }
+  .nav { display: flex; gap: 22px; color: #6b6470; font-size: 14px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 120px 40px 26px; }
+  .wrap.video-wrap { padding-top: 26px; }
+  .hero { height: 210px; border-radius: 14px; background: linear-gradient(135deg, #f6c66f, #ef8b5a 60%, #c95d63); position: relative; overflow: hidden; }
+  .hero::after { content: ""; position: absolute; right: 60px; bottom: -40px; width: 230px; height: 230px; border-radius: 50%; background: rgba(255,255,255,.18); }
+  .hero span { position: absolute; left: 34px; bottom: 26px; color: #fff; font-size: 30px; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .row { display: grid; grid-template-columns: 2fr 1fr; gap: 34px; margin-top: 26px; }
+  .line { height: 11px; border-radius: 6px; background: #e7e2d8; margin: 11px 0; }
+  .line.s { width: 70%; }
+  .card { background: #fff; border: 1px solid #ebe6dc; border-radius: 14px; padding: 18px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+  .card h3 { margin: 0 0 8px; font-size: 16px; }
+
+  /* search page */
+  .search-top { height: 74px; display: flex; align-items: center; gap: 26px; padding: 0 60px; background: #fff; border-bottom: 1px solid #e6e6ea; }
+  .search-top .brand { font-weight: 800; font-size: 24px; color: #3c6ad8; }
+  .search-top .box { width: 560px; height: 44px; border-radius: 22px; border: 1px solid #d5d7de; display: flex; align-items: center; padding: 0 20px; font-size: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .results { padding: 22px 0 0 196px; max-width: 900px; }
+  .result { margin-bottom: 24px; }
+  .result .url { font-size: 13px; color: #4d5156; }
+  .result a { display: block; font-size: 20px; color: #1a4fbf; text-decoration: none; margin: 2px 0 4px; }
+  .result .snip { color: #4d5156; font-size: 14px; }
+  .tiles { display: flex; gap: 14px; margin: 8px 0 26px; }
+  .tile { width: 150px; height: 106px; border-radius: 12px; }
+
+  /* video page */
+  .video { height: 360px; border-radius: 14px; background: #1d1b24; position: relative; display: grid; place-items: center; }
+  .video .play { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,.9); }
+  .video .play::after { content: ""; display: block; margin: 24px 0 0 32px; border: 16px solid transparent; border-left: 26px solid #1d1b24; }
+
+  .cursor { position: fixed; z-index: 2147483647; width: 26px; pointer-events: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,.4)); }
+  .popup-frame { position: fixed; z-index: 2147483647; right: 60px; top: 108px; width: 342px; height: 650px; border: 1px solid #d9d2c4; border-radius: 12px; box-shadow: 0 14px 40px rgba(0,0,0,.25); background: #fbf7ef; overflow: hidden; }
+</style>
+</head>
+<body>
+<div class="caption">
+  <div class="badge"><svg viewBox="0 0 40 30"><ellipse cx="20" cy="22" rx="18" ry="5" fill="#2f4756"/><path d="M8 22 Q7 4 20 5 Q33 4 32 22 Z" fill="#46677a"/><rect x="8.4" y="15" width="23.2" height="4" fill="#e8833a"/></svg></div>
+  <div><h1 id="cap-title"></h1><p id="cap-sub"></p></div>
+</div>
+<div class="page" id="page"></div>
+
+<script>
+  const S = Number(new URLSearchParams(location.search).get('s') || 1);
+
+  const PAGES = {
+    article: `
+      <div class="site-top"><span class="logo">Weekend Kitchen</span><div class="nav"><span>Recipes</span><span>Baking</span><span>Quick meals</span><span>About</span></div></div>
+      <div class="wrap">
+        <div class="hero" id="hero"><span>10 cozy dinners to make this week</span></div>
+        <div class="row"><div>${'<div class="line"></div>'.repeat(5)}<div class="line s"></div></div>
+        <div class="card" id="side"><h3>Popular</h3><div class="line"></div><div class="line s"></div></div></div>
+      </div>`,
+    search: `
+      <div class="search-top"><span class="brand">Seekr</span><div class="box">easy homemade pizza recipe</div></div>
+      <div class="results">
+        <div class="tiles"><div class="tile" style="background:#f0b35a"></div><div class="tile" style="background:#e07a52"></div><div class="tile" style="background:#c9a46a"></div><div class="tile" style="background:#e6c27a"></div></div>
+        <div class="result"><div class="url">weekendkitchen.example › pizza</div><a>The Easiest Homemade Pizza Dough (Only 5 Ingredients)</a><div class="snip">Soft, chewy crust in under an hour. Top it with whatever you like and bake until bubbly…</div></div>
+        <div class="result"><div class="url">familyfood.example › dinner › pizza-night</div><a>Pizza Night: 12 Topping Ideas the Whole Family Will Love</a><div class="snip">From classic margherita to pineapple and peppers, here's how to set up a build-your-own pizza bar…</div></div>
+      </div>`,
+    notes: `
+      <div class="site-top"><span class="logo" style="color:#3d6f48">StudyBoard</span><div class="nav"><span>My notes</span><span>Flashcards</span><span>Planner</span></div></div>
+      <div class="wrap">
+        <div class="row" style="margin-top:0"><div class="card" id="main" style="height:240px"><h3>Science project: plant growth</h3>${'<div class="line"></div>'.repeat(4)}<div class="line s"></div></div>
+        <div class="card" id="todo" style="height:170px"><h3>To do</h3><div class="line"></div><div class="line"></div><div class="line s"></div></div></div>
+      </div>`,
+    video: `
+      <div class="site-top"><span class="logo" style="color:#c0392b">Clipster</span><div class="nav"><span>Home</span><span>Trending</span><span>Music</span></div></div>
+      <div class="wrap video-wrap"><div class="video"><div class="play"></div></div><div class="line" style="margin-top:20px;width:60%;height:16px"></div><div class="line s"></div></div>`,
+  };
+
+  const SCENES = {
+    1: { title: 'A tiny spy family lives in your tabs', sub: 'They walk, climb the edges and hop onto pictures, headings and cards.', page: 'article' },
+    2: { title: 'They react to what you search', sub: 'Pizza makes everyone hungry. Homework makes Pip panic. Music starts a party.', page: 'search' },
+    3: { title: 'Pick them up, poke them, pet them', sub: 'Drag and toss them anywhere, click for a reaction, wiggle the cursor for head pats.', page: 'notes' },
+    4: { title: 'They hang out with each other', sub: 'Chats, high-fives, hugs, and a dog who just wants to play.', page: 'video' },
+    5: { title: 'Make the crew your own', sub: 'Rename them, upload your own pictures, choose who’s home, or hide them on any site.', page: 'article' },
+  };
+  const sc = SCENES[S];
+  document.getElementById('cap-title').textContent = sc.title;
+  document.getElementById('cap-sub').textContent = sc.sub;
+  document.getElementById('page').innerHTML = PAGES[sc.page];
+
+  // chrome.* shim: start with search reactions and typing cheers off so poses stay put
+  (function () {
+    const data = { settings: { reactToSearch: false, workEmotes: false, roam: false, scale: 1.6 } };
+    window.chrome = window.chrome || {};
+    chrome.storage = { local: {
+      get(keys, cb) { const out = {}; [].concat(keys).forEach(k => { if (k in data) out[k] = data[k]; }); cb(out); },
+      set(obj, cb) { Object.assign(data, obj); cb && cb(); } },
+      onChanged: { addListener() {} } };
+    chrome.runtime = { onMessage: { addListener() {} } };
+  })();
+</script>
+<script src="../../content/shared.js"></script>
+<script src="../../content/art.js"></script>
+<script src="../../content/styles.js"></script>
+<script src="../../content/engine.js"></script>
+<script>
+  const FOREVER = 1e9;
+  const M = (id) => CovertCrew.members.get(id);
+
+  // Put a character somewhere and freeze them in an action.
+  function pose(id, o) {
+    const m = M(id);
+    m.endAct();
+    m.queue.length = 0;
+    m.entering = false;
+    m.vx = m.vy = 0;
+    m.clinging = false;
+    m.grounded = true;
+    m.platform = o.on ? document.getElementById(o.on) : null;
+    m.x = o.x;
+    m.facing = o.facing || 1;
+    if (o.cling) {
+      m.startCling(o.cling);
+      m.y = o.y;
+      m.startAct({ name: 'climb', phase: 'hold', t: FOREVER });
+    } else if (o.held) {
+      m.grounded = false;
+      m.setState('held');
+      m.el.classList.add('held');
+      m.y = o.y;
+      setInterval(() => { m.heldVX = o.swing || -500; }, 30);
+    } else {
+      m.startAct(Object.assign({ name: 'idle' }, o.act, { t: FOREVER }));
+    }
+    if (o.expr) m.setExpr(o.expr, FOREVER);
+    if (o.prop) m.setProp(o.prop);
+    if (o.say) m.say(o.say, FOREVER);
+    if (o.emote) m.emote(o.emote, FOREVER);
+    if (o.hearts) setInterval(() => m.particles(o.hearts, 1), 650);
+  }
+
+  function cursor(x, y) {
+    const c = document.createElement('div');
+    c.className = 'cursor';
+    c.style.left = x + 'px';
+    c.style.top = y + 'px';
+    c.innerHTML = '<svg viewBox="0 0 20 30"><path d="M1 1 L1 23 L6.5 17.5 L10.5 27 L14 25.5 L10 16.5 L18 16.5 Z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+    document.body.appendChild(c);
+  }
+
+  const STAGE = {
+    1() {
+      const hero = document.getElementById('hero').getBoundingClientRect();
+      pose('dad', { x: 200, act: { name: 'read' }, emote: '☕' });
+      pose('mom', { x: 0, cling: 1, y: 470, expr: 'happy', emote: '💪' });
+      pose('kid', { x: hero.left + 340, on: 'hero', act: { name: 'wave' }, say: 'Hi! We live here now!' });
+      pose('dog', { x: 700, facing: -1, act: { name: 'sniff' }, emote: '👃' });
+    },
+    2() {
+      pose('dad', { x: 300, facing: 1, expr: 'happy', say: 'Dinner is decided, then.' });
+      pose('mom', { x: 470, facing: 1, expr: 'love', emote: '😋' });
+      pose('kid', { x: 640, facing: -1, expr: 'excited', say: 'Snack time?!', emote: '🤤' });
+      pose('dog', { x: 800, facing: -1, expr: 'love', prop: 'bone', emote: '🍖' });
+    },
+    3() {
+      const todo = document.getElementById('todo').getBoundingClientRect();
+      pose('dad', { x: 480, held: true, y: 560, expr: 'surprised', say: 'Put me down!', swing: -900 });
+      cursor(474, 560 - M('dad').h * 0.9);
+      pose('kid', { x: todo.left + 150, on: 'todo', expr: 'love', hearts: '💗', say: 'More head pats!' });
+      cursor(todo.left + 160, todo.top - M('kid').h * 0.75);
+      pose('mom', { x: 200, act: { name: 'train' }, say: 'Hi-yah!' });
+      pose('dog', { x: 840, facing: -1, act: { name: 'idle' }, expr: 'excited', emote: '❗' });
+    },
+    4() {
+      pose('dad', { x: 300, facing: 1, expr: 'shy', say: 'You look nice today.' });
+      pose('mom', { x: 388, facing: -1, expr: 'shy', hearts: '💕' });
+      pose('kid', { x: 760, facing: 1, act: { name: 'dance' }, expr: 'excited', emote: '✨' });
+      pose('dog', { x: 870, facing: -1, act: { name: 'idle' }, expr: 'excited', emote: '🐾' });
+    },
+    5() {
+      pose('dad', { x: 140, act: { name: 'wave' }, expr: 'happy' });
+      pose('mom', { x: 250, expr: 'happy' });
+      pose('kid', { x: 350, act: { name: 'dance' }, expr: 'excited', emote: '🎉' });
+      pose('dog', { x: 470, facing: -1, expr: 'happy', emote: '🐾' });
+      // The real popup, inside a frame with its own chrome.* shim.
+      const base = new URL('../../', location.href).href;
+      const shim = `<script>window.chrome={storage:{local:{get:async()=>({}),set:async()=>{}}},tabs:{query:async()=>[{id:1,url:'https://weekendkitchen.example/'}],sendMessage:async()=>({ok:true})}};<\/script>`;
+      fetch(base + 'popup/popup.html').then(r => r.text()).then(html => {
+        const f = document.createElement('iframe');
+        f.className = 'popup-frame';
+        f.srcdoc = html.replace('<head>', `<head><base href="${base}popup/">${shim}`);
+        document.body.appendChild(f);
+      });
+    },
+  };
+
+  setTimeout(() => STAGE[S](), 1500);
+</script>
+</body>
+</html>

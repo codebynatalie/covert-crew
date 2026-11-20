@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Covert Crew promo art</title>
+<!--
+  Store artwork, rendered by store\make-images.ps1 with headless Edge:
+    promo.html?kind=small    440x280 small promo tile (Chrome)
+    promo.html?kind=marquee  1400x560 marquee (Chrome, optional)
+    promo.html?kind=logo     300x300 store logo (Edge)
+-->
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; font-family: "Segoe UI", system-ui, sans-serif; }
+  body { background: radial-gradient(circle at 75% 20%, #6d93a8 0, #46677a 45%, #2f4756 100%); color: #fff; position: relative; }
+  .ground { position: absolute; left: 0; right: 0; bottom: 0; background: #f2c230; box-shadow: inset 0 4px 0 #2a2230; }
+  .crew { position: absolute; display: flex; align-items: flex-end; }
+  .who { position: relative; }
+  .who svg { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 2px 0 rgba(0,0,0,.25)); }
+  .title { position: absolute; font-weight: 800; letter-spacing: .3px; text-shadow: 0 3px 0 #2a2230, 0 0 18px rgba(0,0,0,.25); line-height: 1.02; }
+  .title small { display: block; font-weight: 600; letter-spacing: .2px; text-shadow: 0 2px 0 rgba(42,34,48,.7); opacity: .95; }
+  .bubble { position: absolute; background: #fff; color: #2a2230; border: 3px solid #2a2230; border-radius: 16px 16px 16px 4px; font-weight: 700; padding: 4px 10px; box-shadow: 0 3px 0 rgba(0,0,0,.2); }
+  .star { position: absolute; color: #ffd23f; text-shadow: 0 2px 0 #2a2230; }
+</style>
+</head>
+<body>
+<script src="../../content/shared.js"></script>
+<script src="../../content/art.js"></script>
+<script src="../../content/styles.js"></script>
+<script>
+  const kind = new URLSearchParams(location.search).get('kind') || 'small';
+  // Fixed canvas sizes: headless browsers won't make windows narrower than ~500px,
+  // so lay out on an exact-size body instead of trusting the window size.
+  const [W, H] = { small: [440, 280], marquee: [1400, 560], logo: [300, 300] }[kind];
+  Object.assign(document.body.style, { width: W + 'px', height: H + 'px', overflow: 'hidden' });
+  // The expression / accessory rules from the extension's own stylesheet.
+  const style = document.createElement('style');
+  style.textContent = CovertCrew.css.replace(/:host\{[^}]*\}/, '');
+  document.head.appendChild(style);
+
+  function figure(id, height, eyes, mouth, opts = {}) {
+    const art = CovertCrew.art[id];
+    const d = document.createElement('div');
+    d.className = 'who';
+    d.style.height = height + 'px';
+    d.style.width = (height * art.vbw / art.vbh) + 'px';
+    d.dataset.eyes = eyes;
+    d.dataset.mouth = mouth;
+    if (opts.blush) d.dataset.blush = '1';
+    if (opts.shades) d.dataset.acc = 'shades';
+    if (opts.flip) d.style.transform = 'scaleX(-1)';
+    if (opts.lift) d.style.marginBottom = opts.lift + 'px';
+    d.innerHTML = art.svg();
+    if (opts.arm) d.querySelectorAll('.arm-r').forEach(a => { a.style.transformBox = 'fill-box'; a.style.transformOrigin = '50% 0'; a.style.transform = 'rotate(-150deg)'; });
+    return d;
+  }
+
+  function crew(scale, gap) {
+    const c = document.createElement('div');
+    c.className = 'crew';
+    c.style.gap = gap + 'px';
+    c.append(
+      figure('dad', 100 * scale, 'open', 'smirk', { shades: true }),
+      figure('mom', 90 * scale, 'happy', 'grin', { blush: true, arm: true }),
+      figure('kid', 60 * scale, 'star', 'grin', { blush: true, arm: true }),
+      figure('dog', 40 * scale, 'happy', 'grin', { flip: true }),
+    );
+    return c;
+  }
+
+  function el(cls, html, css) {
+    const e = document.createElement('div');
+    e.className = cls;
+    e.innerHTML = html;
+    Object.assign(e.style, css);
+    document.body.appendChild(e);
+    return e;
+  }
+
+  if (kind === 'logo') {
+    // Square store logo: the crew's hat on a yellow badge.
+    document.body.style.background = 'transparent';
+    el('', `<svg viewBox="0 0 128 128" width="${W}" height="${H}">
+      <circle cx="64" cy="64" r="60" fill="#f2c230"/><circle cx="64" cy="64" r="58" fill="none" stroke="#2a2230" stroke-width="6"/>
+      <path d="M34 78 C30 30 98 30 94 78 Z" fill="#46677a"/><rect x="35" y="64" width="58" height="12" fill="#e8833a"/>
+      <ellipse cx="64" cy="82" rx="50" ry="10" fill="#2f4756"/></svg>`, { position: 'absolute', inset: '0' });
+  } else if (kind === 'small') {
+    el('ground', '', { height: '46px' });
+    const c = crew(1.1, 4);
+    Object.assign(c.style, { right: '12px', bottom: '42px' });
+    document.body.appendChild(c);
+    el('title', 'Covert<br>Crew<small>in your tabs</small>', { left: '24px', top: '28px', fontSize: '44px' });
+    document.querySelector('.title small').style.fontSize = '21px';
+    el('bubble', 'Hi!', { right: '96px', top: '86px', fontSize: '17px' });
+  } else {
+    // marquee
+    el('ground', '', { height: '90px' });
+    const c = crew(2.6, 14);
+    Object.assign(c.style, { right: '60px', bottom: '84px' });
+    document.body.appendChild(c);
+    el('title', 'Covert Crew<small>A tiny spy family that lives in your browser tabs</small>', { left: '70px', top: '120px', fontSize: '86px' });
+    document.querySelector('.title small').style.cssText = 'font-size:28px;margin-top:14px;max-width:520px;line-height:1.25';
+    el('bubble', 'Mission: keep you company!', { right: '330px', top: '70px', fontSize: '26px' });
+    el('star', '✦', { left: '640px', top: '60px', fontSize: '40px' });
+    el('star', '✦', { left: '700px', top: '420px', fontSize: '28px' });
+  }
+</script>
+</body>
+</html>
