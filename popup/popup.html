@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Covert Crew</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <div class="title">
+      <h1>Covert Crew</h1>
+      <p>A tiny spy family lives in your tabs</p>
+    </div>
+    <label class="switch big" title="Turn the crew on or off">
+      <input type="checkbox" id="enabled" />
+      <span></span>
+    </label>
+  </header>
+
+  <section class="commands">
+    <button data-cmd="gather">📣 Gather</button>
+    <button data-cmd="party">🎉 Party</button>
+    <button data-cmd="wave">👋 Say hi</button>
+    <button data-cmd="sleep">💤 Nap time</button>
+  </section>
+  <p id="cmd-note" class="note" hidden></p>
+
+  <section>
+    <h2>Who's home</h2>
+    <div id="members"></div>
+    <p class="hint">Upload your own picture (PNG with a transparent background works best) to change how someone looks.</p>
+  </section>
+
+  <section>
+    <h2>Behavior</h2>
+    <label class="row"><span>React to what you search</span><span class="switch"><input type="checkbox" id="reactToSearch" /><span></span></span></label>
+    <label class="row"><span>Cheer you on while you type</span><span class="switch"><input type="checkbox" id="workEmotes" /><span></span></span></label>
+    <label class="row"><span>Climb onto page stuff</span><span class="switch"><input type="checkbox" id="roam" /><span></span></span></label>
+    <label class="row"><span>Size</span><input type="range" id="scale" min="0.6" max="1.6" step="0.1" /></label>
+    <label class="row" id="site-row" hidden><span>Show on <b id="site-name"></b></span><span class="switch"><input type="checkbox" id="site" /><span></span></span></label>
+  </section>
+
+  <footer>Drag to pick them up · Click to poke · Double-click for a trick · Wiggle the cursor over them to pet</footer>
+
+  <template id="member-tpl">
+    <div class="member">
+      <label class="switch small"><input type="checkbox" class="on" /><span></span></label>
+      <div class="pic"></div>
+      <div class="info">
+        <input class="name" maxlength="24" spellcheck="false" />
+        <span class="role"></span>
+      </div>
+      <label class="icon-btn" title="Upload a custom picture">🖼️<input type="file" accept="image/*" hidden /></label>
+      <button class="icon-btn reset" title="Back to the original look" hidden>↺</button>
+    </div>
+  </template>
+
+  <script src="../content/shared.js"></script>
+  <script src="../content/art.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
